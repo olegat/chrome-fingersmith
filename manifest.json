@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Multi-Finger Touch Tester",
+  "name": "Fingersmith Touch Tester",
   "version": "1.0",
   "description": "Test multi-finger touch events by simulating touch interactions with the mouse.",
   "permissions": ["activeTab", "scripting"],
@@ -11,6 +11,16 @@
     }
   ],
   "action": {
-    "default_title": "Enable Touch Tester"
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    },
+    "default_title": "Fingersmith"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
   }
 }

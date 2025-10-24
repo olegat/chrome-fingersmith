@@ -45,6 +45,9 @@ rule cp
 build build.ninja: regen | build.regen tsconfig.json
 build dist/content.js: ts content.ts || build.ninja
 build dist/manifest.json: cp manifest.json || build.ninja
+build dist/icon16.png: cp icon16.png || build.ninja
+build dist/icon48.png: cp icon48.png || build.ninja
+build dist/icon128.png: cp icon128.png || build.ninja
 `.trim() + '\n';
 
 // Write build.ninja
