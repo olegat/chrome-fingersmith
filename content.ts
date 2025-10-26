@@ -15,12 +15,17 @@ function createTouchVisual(x: number, y: number): HTMLDivElement {
     el.style.position = 'fixed';
     el.style.width = '30px';
     el.style.height = '30px';
-    el.style.background = 'rgba(0, 150, 255, 0.5)';
+    el.style.background = 'rgba(0, 150, 255, 0.4)';
     el.style.borderRadius = '50%';
     el.style.left = `${x - 15}px`;
     el.style.top = `${y - 15}px`;
     el.style.zIndex = '9999';
     el.style.cursor = 'grab';
+    el.style.border = '2px solid rgba(255, 255, 255, 0.9)';
+    el.style.boxShadow = `
+        0 0 6px rgba(0, 0, 0, 0.6),
+        0 0 2px rgba(0, 0, 0, 0.4)
+    `;
     el.classList.add('synthetic-touch');
     document.body.appendChild(el);
     return el;
