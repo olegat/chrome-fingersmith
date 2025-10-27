@@ -7,7 +7,7 @@ Usage:
 - Click the page: This will simulate a `touchstart` event.
   - *Note:* You can hold <kbd>Shift</kbd> to create multiple Touches.
 - Click and drag a Visual Touch circle: This will simulate a `touchmove` event.
-  - *Note:* You can hold <kbd>Alt</kbd> to toggle the "Move All Touches" move.
+  - *Note:* You can hold <kbd>Alt</kbd> to toggle the "Move All Touches" mode.
 - Double-click Visual Touch circle: This will simulate a `touchend` event.
 
 You can use the "+☝️" button repeatedly to create multiple target touches.
