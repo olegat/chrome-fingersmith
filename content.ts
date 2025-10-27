@@ -109,11 +109,10 @@ function createTouch(target: EventTarget & Element, x: number, y: number, identi
         el.removeEventListener('dblclick', ondblclick);
     }
 
-    // Mouse down for dragging
     el.addEventListener('mousedown', onmousedown);
     el.addEventListener('dblclick', ondblclick);
 
-    const synthetic: SyntheticTouch = { touch, el, isDragging: false, offsetX: 0, offsetY: 0, destroy};
+    const synthetic: SyntheticTouch = { touch, el, isDragging: false, offsetX: 0, offsetY: 0, destroy };
     touches.push(synthetic);
     return synthetic;
 }
@@ -171,7 +170,7 @@ function globMouseUp(): void {
 //------------------------------------------------------------------------------
 // Enable / Disable Extension:
 //------------------------------------------------------------------------------
-function enableFingersmith() {
+function enableFingersmith(): void {
     if (newTouchBtn.ptr == undefined) {
         const btn = document.createElement('button');
         btn.innerText = '+☝️';
@@ -208,7 +207,7 @@ function enableFingersmith() {
             };
 
             window.addEventListener('click', clickHandler, { capture: true, once: true });
-        }
+        };
         btn.addEventListener('click', onclick);
 
         document.addEventListener('mousemove', globMouseMove);
@@ -228,6 +227,7 @@ function disableFingersmith(): void {
         document.removeEventListener('mousemove', globMouseMove);
         document.removeEventListener('mouseup', globMouseUp);
         newTouchBtn.ptr = undefined;
+        touches.clear();
     }
 }
 
