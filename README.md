@@ -1,4 +1,4 @@
-# Fingersmith
+# ![Fingersmith Icon](./icon48.png) Fingersmith
 
 A simple Chrome Extension for simulating Touch Events with the Mouse
 
