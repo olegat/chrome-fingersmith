@@ -144,7 +144,8 @@ function globMouseMove(me: MouseEvent): void {
     const draggingTouches = touches.filter(t => t.isDragging);
     if (draggingTouches.length === 0) return;
 
-    const moveTargets = moveAllTouches ? touches : draggingTouches;
+    const moveAll: boolean = me.altKey ? !moveAllTouches : moveAllTouches;
+    const moveTargets = moveAll ? touches : draggingTouches;
     const dX = me.clientX - lastClientX;
     const dY = me.clientY - lastClientY;
     moveTargets.forEach(t => {
@@ -215,11 +216,13 @@ function enableFingersmith(): void {
 
                 fireTouchEvent('touchstart', touches.map(t => t.touch));
 
-                document.body.style.cursor = prevCursor;
-                document.removeEventListener('click', clickHandler, true);
+                if (!e.shiftKey) {
+                    document.body.style.cursor = prevCursor;
+                    window.removeEventListener('click', clickHandler, true);
+                }
             };
 
-            window.addEventListener('click', clickHandler, { capture: true, once: true });
+            window.addEventListener('click', clickHandler, { capture: true });
         };
         btn.addEventListener('click', onclick);
 
