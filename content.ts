@@ -93,6 +93,7 @@ function createTouch(target: EventTarget & Element, x: number, y: number, identi
 
     const onmousedown = (me: MouseEvent) => {
         if (me.detail === 2) return; // Ignore double-click for drag
+        if (me.button !== 0) return; // Left-clicks only
         synthetic.isDragging = true;
         lastClientX = me.clientX;
         lastClientY = me.clientY;
@@ -172,7 +173,8 @@ function globMouseMove(me: MouseEvent): void {
     fireTouchEvent('touchmove', touches.map(tc => tc.touch));
 }
 
-function globMouseUp(): void {
+function globMouseUp(me: MouseEvent): void {
+    if (me.button !== 0) return; // Left-clicks only
     touches.forEach(t => t.isDragging = false);
 }
 
