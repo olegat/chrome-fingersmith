@@ -2,23 +2,19 @@
 const toggle = document.getElementById('toggle') as HTMLInputElement;
 const moveAll = document.getElementById('moveAll') as HTMLInputElement;
 
-// Restore toggle states when popup opens
-chrome.storage.local.get(['fingersmithEnabled', 'moveAllTouches'], (result: {
+type FingersmithStorage = {
     fingersmithEnabled?: boolean;
     moveAllTouches?: boolean;
-}) => {
+};
+
+chrome.storage.local.get(['fingersmithEnabled', 'moveAllTouches'], (result: FingersmithStorage) => {
     toggle.checked = Boolean(result.fingersmithEnabled);
     moveAll.checked = Boolean(result.moveAllTouches);
 });
 
-// When user flips the toggle
 toggle.addEventListener('change', () => {
     const enabled = toggle.checked;
-
-    // Persist the new state
     chrome.storage.local.set({ fingersmithEnabled: enabled });
-
-    // Send message to active tab to enable/disable Fingersmith
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
         const activeTab = tabs[0];
         if (activeTab?.id !== undefined) {
@@ -29,12 +25,9 @@ toggle.addEventListener('change', () => {
     });
 });
 
-// Toggle move-all behavior
 moveAll.addEventListener('change', () => {
     const moveAllTouches = moveAll.checked;
-
     chrome.storage.local.set({ moveAllTouches });
-
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
         const activeTab = tabs[0];
         if (activeTab?.id !== undefined) {
