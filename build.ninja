@@ -7,7 +7,7 @@ rule regen
   description = Re-generating Ninja File
 
 rule ts
-  command = npx tsc $in --outFile $out --target ES2022 --module system --lib ES2022,DOM --strict --noImplicitAny --noImplicitThis --alwaysStrict --strictBindCallApply --strictFunctionTypes --strictNullChecks --strictPropertyInitialization --noImplicitReturns --noFallthroughCasesInSwitch --noUnusedLocals --noUnusedParameters --noUncheckedIndexedAccess --noPropertyAccessFromIndexSignature --forceConsistentCasingInFileNames --esModuleInterop --moduleResolution Node --skipLibCheck --outDir ./dist --sourceMap
+  command = npx tsc $in --outFile $out --target ES2022 --module system --types chrome --lib ES2022,DOM --strict --noImplicitAny --noImplicitThis --alwaysStrict --strictBindCallApply --strictFunctionTypes --strictNullChecks --strictPropertyInitialization --noImplicitReturns --noFallthroughCasesInSwitch --noUnusedLocals --noUnusedParameters --noUncheckedIndexedAccess --noPropertyAccessFromIndexSignature --forceConsistentCasingInFileNames --esModuleInterop --moduleResolution Node --skipLibCheck --outDir ./dist --sourceMap
   description = Compiling $in
 
 rule cp
@@ -16,6 +16,8 @@ rule cp
 
 build build.ninja: regen | build.regen tsconfig.json
 build dist/content.js: ts content.ts || build.ninja
+build dist/popup.js: ts popup.ts || build.ninja
+build dist/popup.html: cp popup.html || build.ninja
 build dist/manifest.json: cp manifest.json || build.ninja
 build dist/icon16.png: cp icon16.png || build.ninja
 build dist/icon48.png: cp icon48.png || build.ninja

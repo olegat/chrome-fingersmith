@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "system",
+    "types": ["chrome"],
     "lib": ["ES2022", "DOM"],
     "strict": true,
     "noImplicitAny": true,
