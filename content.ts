@@ -14,8 +14,8 @@ interface DestroyableElement<T extends Element> extends Destroyable {
 interface SyntheticTouch extends DestroyableElement<HTMLDivElement> {
     touch: Touch;
     isDragging: boolean;
-    offsetX: number;
-    offsetY: number;
+    x: number;
+    y: number;
 }
 
 class ClearableArray<T extends Destroyable> extends Array<T> {
@@ -48,6 +48,9 @@ class UniquePtr<T extends Destroyable> {
 //------------------------------------------------------------------------------
 const touches = new ClearableArray<SyntheticTouch>();
 let newTouchBtn = new UniquePtr<DestroyableElement<HTMLButtonElement>>();
+let moveAllTouches = false;
+let lastClientX: number = 0;
+let lastClientY: number = 0;
 
 
 
@@ -91,8 +94,8 @@ function createTouch(target: EventTarget & Element, x: number, y: number, identi
     const onmousedown = (me: MouseEvent) => {
         if (me.detail === 2) return; // Ignore double-click for drag
         synthetic.isDragging = true;
-        synthetic.offsetX = me.clientX - el.getBoundingClientRect().left;
-        synthetic.offsetY = me.clientY - el.getBoundingClientRect().top;
+        lastClientX = me.clientX;
+        lastClientY = me.clientY;
         me.preventDefault();
     };
 
@@ -112,7 +115,7 @@ function createTouch(target: EventTarget & Element, x: number, y: number, identi
     el.addEventListener('mousedown', onmousedown);
     el.addEventListener('dblclick', ondblclick);
 
-    const synthetic: SyntheticTouch = { touch, el, isDragging: false, offsetX: 0, offsetY: 0, destroy };
+    const synthetic: SyntheticTouch = { touch, el, isDragging: false, x, y, destroy };
     touches.push(synthetic);
     return synthetic;
 }
@@ -137,28 +140,36 @@ function fireTouchEvent(type: string, touchesArray: Touch[]): void {
 // Global drag handling
 //------------------------------------------------------------------------------
 function globMouseMove(me: MouseEvent): void {
-    touches.forEach(t => {
-        if (!t.isDragging) return;
-        const x = me.clientX - t.offsetX + 15;
-        const y = me.clientY - t.offsetY + 15;
-        t.el.style.left = `${x - 15}px`;
-        t.el.style.top = `${y - 15}px`;
+    const draggingTouches = touches.filter(t => t.isDragging);
+    if (draggingTouches.length === 0) return;
+
+    const moveTargets = moveAllTouches ? touches : draggingTouches;
+    const dX = me.clientX - lastClientX;
+    const dY = me.clientY - lastClientY;
+    moveTargets.forEach(t => {
+        t.x += dX;
+        t.y += dY;
+        t.el.style.left = `${t.x - 15}px`;
+        t.el.style.top = `${t.y - 15}px`;
 
         t.touch = new Touch({
             identifier: t.touch.identifier,
             target: t.touch.target,
-            clientX: x,
-            clientY: y,
-            pageX: x,
-            pageY: y,
+            clientX: t.x,
+            clientY: t.y,
+            pageX: t.x,
+            pageY: t.y,
             radiusX: 10,
             radiusY: 10,
             rotationAngle: 0,
             force: 0.5
         });
-
-        fireTouchEvent('touchmove', touches.map(tc => tc.touch));
     });
+    lastClientX = me.clientX;
+    lastClientY = me.clientY;
+
+    // Fire a combined touchmove for all current touches
+    fireTouchEvent('touchmove', touches.map(tc => tc.touch));
 }
 
 function globMouseUp(): void {
@@ -231,11 +242,24 @@ function disableFingersmith(): void {
     }
 }
 
+
+
+//------------------------------------------------------------------------------
+// Message Handling from Popup
+//------------------------------------------------------------------------------
 chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.type === 'enable') enableFingersmith();
-  else if (msg.type === 'disable') disableFingersmith();
+    if (msg.type === 'enable') enableFingersmith();
+    else if (msg.type === 'disable') disableFingersmith();
+    else if (msg.type === 'setMoveAll') {
+        moveAllTouches = Boolean(msg.value);
+        chrome.storage.local.set({ moveAllTouches }); // persist change
+    }
 });
 
-chrome.storage.local.get(['fingersmithEnabled'], (result) => {
-  if (result['fingersmithEnabled']) enableFingersmith();
+// Restore settings on load
+chrome.storage.local.get(['fingersmithEnabled', 'moveAllTouches'], (result) => {
+    if (result['moveAllTouches'] !== undefined)
+        moveAllTouches = Boolean(result['moveAllTouches']);
+    if (result['fingersmithEnabled'])
+        enableFingersmith();
 });
